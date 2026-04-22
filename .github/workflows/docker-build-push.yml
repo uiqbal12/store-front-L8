@@ -27,16 +27,10 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/store-front:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/store-front:${{ github.sha }}
 
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Set AKS context
-        uses: azure/aks-set-context@v3
-        with:
-          resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
-          cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
+      - name: Set up kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
 
       - name: Deploy to AKS
         run: |
