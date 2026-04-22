@@ -7,6 +7,9 @@
     @removeFromCart="removeFromCart"
     @submitOrder="submitOrder"
   ></router-view>
+  <footer>
+    <p>© 2024 Best Buy Canada Ltd. All Rights Reserved.</p>
+  </footer>
 </template>
 
 <script>
@@ -38,7 +41,6 @@ export default {
       fetch('/products')
         .then(response => response.json())
         .then(products => {
-          console.log('success getting proxy products')
           this.products = products
         })
         .catch(error => {
@@ -47,15 +49,12 @@ export default {
         })
     },
     addToCart({ productId, quantity }) {
-      // check if the product is already in the cart
       const existingCartItem = this.cartItems.find(
         item => item.product.id == productId
       )
       if (existingCartItem) {
-        // if it is, increment the quantity
         existingCartItem.quantity += quantity
       } else {
-        // if not, find the product, and add it with quantity to the cart
         const product = this.products.find(product => product.id == productId)
         this.cartItems.push({ product, quantity })
       }
@@ -64,10 +63,6 @@ export default {
       this.cartItems.splice(index, 1)
     },
     submitOrder() {
-      // get the order-service URL from an environment variable
-      // const orderServiceUrl = process.env.VUE_APP_ORDER_SERVICE_URL;
-
-      // create an order object
       const order = {
         customerId: Math.floor(Math.random() * 10000000000).toString(),
         items: this.cartItems.map(item => {
@@ -79,23 +74,17 @@ export default {
         })
       }
 
-      console.log(JSON.stringify(order));
-
-      // call the order-service using fetch
       fetch(`/order`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(order)
       })
         .then(response => {
-          console.log(response)
           if (!response.ok) {
             alert('Error occurred while submitting order')
           } else {
             this.cartItems = []
-            alert('Order submitted successfully')
+            alert('Order submitted successfully!')
           }
         })
         .catch(error => {
@@ -108,141 +97,179 @@ export default {
 </script>
 
 <style>
+/* ── Best Buy Brand Colors ────────────────────────────────────────────────── */
+:root {
+  --bb-blue:   #003DA5;
+  --bb-yellow: #FFE000;
+  --bb-dark:   #1B1B1B;
+  --bb-gray:   #F5F5F5;
+  --bb-border: #E0E0E0;
+  --bb-text:   #1B1B1B;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
-  background-image: url('@/assets/algonquin.jpg');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed; /* Keeps the background in place when scrolling */
+  background-color: var(--bb-gray);
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: var(--bb-text);
   margin: 0;
   padding: 0;
 }
 
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 120px;
+  margin-top: 80px;
+  min-height: 100vh;
 }
 
+/* ── Footer ──────────────────────────────────────────────────────────────── */
 footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: #0a5620;
-  color: #fff;
-  padding: 1rem;
-  margin: 0;
+  background-color: var(--bb-dark);
+  color: #aaa;
+  text-align: center;
+  padding: 1.5rem;
+  font-size: 0.85rem;
+  margin-top: 4rem;
 }
 
-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-ul {
-  display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-li {
-  margin: 0 1rem;
-}
-
-a {
-  color: #fff;
-  text-decoration: none;
-}
-
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
 button {
-  padding: 10px;
-  background-color: #005f8b;
-  color: #fff;
+  padding: 10px 18px;
+  background-color: var(--bb-yellow);
+  color: var(--bb-dark);
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9rem;
   height: 42px;
+  transition: background-color 0.2s;
 }
 
+button:hover {
+  background-color: #e6ca00;
+}
+
+/* ── Product Grid ─────────────────────────────────────────────────────────── */
 .product-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+  padding: 1.5rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
+/* ── Product Cards ───────────────────────────────────────────────────────── */
 .product-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  margin: 1rem;
-  padding: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 0.5rem;
-  background-color: rgba(255, 255, 255, 0.9);
+  padding: 1.25rem;
+  border: 1px solid var(--bb-border);
+  border-radius: 4px;
+  background-color: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  transition: box-shadow 0.2s;
+}
+
+.product-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.14);
 }
 
 .product-card img {
-  max-width: 100%;
+  width: 180px;
+  height: 180px;
+  object-fit: contain;
   margin-bottom: 1rem;
 }
 
 .product-card a {
   text-decoration: none;
-  color: #333;
+  color: var(--bb-blue);
+}
+
+.product-card a:hover {
+  text-decoration: underline;
 }
 
 .product-card h2 {
-  font-weight: bold;
+  font-size: 1rem;
+  font-weight: 600;
   margin-bottom: 0.5rem;
+  text-align: center;
 }
 
 .product-card p {
-  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+.product-details {
+  width: 100%;
 }
 
 .product-controls {
   display: flex;
   align-items: center;
-  margin-top: 0.5rem;
-}
-
-.product-controls p {
-  margin-right: 20px;
-}
-
-.product-controls button:hover {
-  background-color: #005f8b;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
 }
 
 .product-price {
-  font-weight: bold;
-  font-size: 1.2rem;
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--bb-dark);
+  text-align: center;
+  margin-bottom: 0.25rem;
+}
+
+.price::before {
+  content: '$';
 }
 
 .quantity-input {
-  width: 50px;
-  height: 30px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 5px;
-  margin-right: 10px;
+  width: 52px;
+  height: 38px;
+  border: 1px solid var(--bb-border);
+  border-radius: 4px;
+  padding: 5px 8px;
+  font-size: 0.95rem;
+  text-align: center;
 }
 
+/* ── Shopping Cart ───────────────────────────────────────────────────────── */
 .shopping-cart {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: rgba(255, 255, 255, 0.9);
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #fff;
+  border: 1px solid var(--bb-border);
+  border-radius: 4px;
 }
 
 .shopping-cart h2 {
-  font-size: 24px;
-  margin-bottom: 20px;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--bb-blue);
+  border-bottom: 3px solid var(--bb-yellow);
+  padding-bottom: 0.5rem;
+}
+
+.shopping-cart h3 {
+  text-align: center;
+  color: #666;
+  padding: 2rem;
 }
 
 .shopping-cart-table {
@@ -252,31 +279,52 @@ button {
 
 .shopping-cart-table th,
 .shopping-cart-table td {
-  padding: 10px;
+  padding: 12px 10px;
   text-align: left;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--bb-border);
 }
 
 .shopping-cart-table th {
-  font-weight: bold;
-}
-
-.shopping-cart-table td img {
-  display: block;
-  margin: 0 auto;
+  font-weight: 700;
+  background-color: var(--bb-gray);
+  color: var(--bb-dark);
 }
 
 .checkout-button {
-  margin-top: 20px;
-  padding: 10px 20px;
-  background-color: #007acc;
-  color: #fff;
+  margin-top: 1.5rem;
+  padding: 12px 32px;
+  background-color: var(--bb-yellow);
+  color: var(--bb-dark);
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
+  font-weight: 700;
+  font-size: 1rem;
+  display: block;
+  margin-left: auto;
 }
 
 .checkout-button:hover {
-  background-color: #005f8b;
+  background-color: #e6ca00;
+}
+
+/* ── Nav ─────────────────────────────────────────────────────────────────── */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+ul {
+  display: flex;
+  list-style: none;
+}
+
+li {
+  margin: 0 1rem;
+}
+
+a {
+  text-decoration: none;
 }
 </style>
